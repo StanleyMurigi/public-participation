@@ -33,16 +33,21 @@ class UserView(models.Model):
 
 
 class Vote(models.Model):
+    VOTE_CHOICES = [
+        ('yes', 'Yes'),
+        ('no', 'No')
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE, related_name='votes')
+    discussion = models.ForeignKey('Discussion', on_delete=models.CASCADE, related_name='votes')
+    vote_type = models.CharField(max_length=3, choices=VOTE_CHOICES)  # Yes or No vote
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'discussion')
 
     def __str__(self):
-        return f"{self.user.username} voted on {self.discussion.title}"
-
+        return f"{self.user.username} voted {self.get_vote_type_display()} on {self.discussion.title}"
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

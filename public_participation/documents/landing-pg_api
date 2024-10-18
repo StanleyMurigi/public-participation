@@ -1,0 +1,525 @@
+Skip to content
+ 
+Search Gists
+Search...
+All gists
+Back to GitHub
+@Ayobamidele
+Ayobamidele/user.yml Secret
+Created 6 minutes ago • Report abuse
+Code
+Revisions
+1
+Clone this repository at &lt;script src=&quot;https://gist.github.com/Ayobamidele/664b50f7b2b44e7b1cc1089ae839607f.js&quot;&gt;&lt;/script&gt;
+<script src="https://gist.github.com/Ayobamidele/664b50f7b2b44e7b1cc1089ae839607f.js"></script>
+user.yml
+openapi: 3.0.0
+info:
+  title: Super Admin API
+  version: 1.0.0
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  description: First name of the user.
+                lastname:
+                  type: string
+                  description: Last name of the user.
+                phonenumber:
+                  type: string
+                  description: Phone number of the user.
+                email:
+                  type: string
+                  format: email
+                  description: Email address of the user.
+                password:
+                  type: string
+                  format: password
+                  description: User's password (at least 8 characters).
+              required:
+                - firstname
+                - lastname
+                - phonenumber
+                - email
+                - password
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              example:
+                firstname: John
+                lastname: Doe
+                phonenumber: +1234567890
+                email: john.doe@example.com
+                access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        '401':
+          description: Registration failed
+          content:
+            application/json:
+              example:
+                status_code: 401
+                message: Registration failed
+        '400':
+          description: Bad request (field validation errors)
+          content:
+            application/json:
+              example:
+                status_code: 400
+                error:
+                  - field: email
+                    message: Email address is invalid
+                  - field: password
+                    message: Password must be at least 8 characters long
+    get:
+      summary: Get a paginated list of users
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                users:
+                  - userId: 123
+                    firstname: John
+                    lastname: Doe
+                    email: john.doe@example.com
+                    phonenumber: +1234567890
+                  - userId: 456
+                    firstname: Jane
+                    lastname: Smith
+                    email: jane.smith@example.com
+                    phonenumber: +9876543210
+        '401':
+          description: Unauthorized (authentication error)
+          content:
+            application/json:
+              example:
+                status_code: 401
+                message: Authentication failed
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                status_code: 500
+                message: Something went wrong on the server
+  /users/{userId}:
+    get:
+      summary: Get details of a specific user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+        '400':
+          description: Bad request (Non-existing User)
+          content:
+            application/json:
+              example:
+                status_code: 400
+                message: User does not exist
+  /users/search:
+    get:
+      summary: Search for users based on criteria
+      description: Retrieve a list of users matching specified search criteria.
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+          description: Filter users by ID
+        - name: firstName
+          in: query
+          schema:
+            type: string
+          description: Filter users by first name
+        - name: lastName
+          in: query
+          schema:
+            type: string
+          description: Filter users by last name
+        - name: phone
+          in: query
+          schema:
+            type: string
+          description: Filter users by phone number
+        - name: email
+          in: query
+          schema:
+            type: string
+          description: Filter users by email address
+      responses:
+        '200':
+          description: Successfully retrieved user list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    firstName:
+                      type: string
+                    lastName:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+
+  /users/{userId}/status:
+    put:
+      summary: Activate or deactivate a user account
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Activate
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: User account status updated successfully
+          content:
+            application/json:
+              example:
+                userId: 123
+                firstname: John
+                lastname: Doe
+                email: john.doe@example.com
+                phonenumber: +1234567890
+                active: true
+        '401':
+          description: Unauthorized (authentication error)
+          content:
+            application/json:
+              example:
+                status_code: 401
+                message: Authentication failed
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              example:
+                status_code: 500
+                message: Something went wrong on the server
+ 
+  /users/{userId}/permissions:
+    post:
+      summary: Add user roles and permissions
+      description: Add roles and permissions for a specific user.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user whose permissions need to be modified.
+      requestBody:
+        description: User roles and permissions to add
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roles:
+                  type: array
+                  items:
+                    type: string
+                  description: List of roles to add
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                  description: List of permissions to add
+      responses:
+        '200':
+          description: Successfully added roles and permissions
+    delete:
+      summary: Remove user roles and permissions
+      description: Remove roles and permissions from a specific user.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the user whose permissions need to be modified.
+      requestBody:
+        description: User roles and permissions to remove
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roles:
+                  type: array
+                  items:
+                    type: string
+                  description: List of roles to remove
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                  description: List of permissions to remove
+      responses:
+        '200':
+          description: Successfully removed roles and permissions
+   
+  /toggle-mode:
+    post:
+      summary: Toggle light/dark mode
+      description: Toggle the application between light and dark mode.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dark_mode:
+                  type: boolean
+      responses:
+        '200':
+          description: Mode toggled successfully
+        '400':
+          description: Invalid request
+      
+  /change-font-size:
+    post:
+      summary: Change font size
+      description: Change the font size in the application.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                font_size:
+                  type: string
+                  enum: ["small", "medium", "large"]
+      responses:
+        '200':
+          description: Font size changed successfully
+        '400':
+          description: Invalid request
+  
+  /user/update:
+    put:
+      tags:
+        - Settings
+      summary: Update user information
+      description: Allows users to update their personal information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                phone:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: User information updated successfully.
+        '400':
+          description: Bad request.
+  /user/notifications:
+    put:
+      tags:
+        - Settings
+      summary: Update notification preferences
+      description: Allows users to enable or disable notifications.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailNotifications:
+                  type: boolean
+                phoneNotifications:
+                  type: boolean
+      responses:
+        '200':
+          description: Notification preferences updated successfully.
+        '400':
+          description: Bad request.
+  /landing/details:
+    get:
+      tags:
+        - Landing Page
+      summary: Get landing page details
+      description: Returns details about the landing page such as about and privacy policy.
+      responses:
+        '200':
+          description: Landing page details retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  about:
+                    type: string
+                    example: 'This is the about section content.'
+                  privacyPolicy:
+                    type: string
+                    example: 'This is the privacy policy content.'
+        '404':
+          description: Details not found.
+  /protected/resource:
+    get:
+      tags:
+        - Protected Resource
+      summary: Get protected resource
+      description: Returns a protected resource that requires authentication.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Protected resource retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                # Define your protected resource schema here
+        '401':
+          description: Unauthorized access.
+  /admin/users:
+    get:
+      tags:
+        - Admin Users
+      summary: Get all users
+      description: Retrieve a list of all user accounts with options to search and filter.
+      # Define query parameters for searching and filtering if needed
+      responses:
+        '200':
+          description: List of users retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized access.
+    post:
+      tags:
+        - Admin Users
+      summary: Create a new user
+      description: Create a new user account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '201':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request.
+
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        username:
+          type: string
+          example: 'john_doe'
+        email:
+          type: string
+          format: email
+          example: 'john.doe@example.com'
+        role:
+          type: string
+          example: 'admin'
+    NewUser:
+      type: object
+      properties:
+        username:
+          type: string
+          example: 'new_user'
+        email:
+          type: string
+          format: email
+          example: 'new.user@example.com'
+        password:
+          type: string
+          format: password
+          example: 'securePassword123!'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+# components:
+#   securitySchemes:
+#     bearerAuth:
+#       type: http
+#       scheme: bearer
+#       bearerFormat: JWT
+# security:
+#   - bearerAuth: []
+@Isachi25
+Comment
+ 
+Leave a comment
+ 
+Footer
+© 2024 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+

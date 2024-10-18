@@ -19,7 +19,7 @@ class UserViewSerializer(serializers.ModelSerializer):
 class VoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vote
-        fields = ['id', 'user', 'discussion', 'created_at']
+        fields = ['id', 'user', 'discussion', 'vote_type', 'created_at']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

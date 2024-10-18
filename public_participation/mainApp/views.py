@@ -55,6 +55,7 @@ class VoteViewSet(viewsets.ModelViewSet):
 
         serializer.save(user=user)
 
+        
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
