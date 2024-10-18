@@ -9,6 +9,7 @@ router.register(r'userviews', UserViewViewSet)
 router.register(r'votes', VoteViewSet)
 router.register(r'comments', CommentViewSet)
 
+app_name = 'mainApp'
 urlpatterns = [
     path('api/', include(router.urls)),
 ]
